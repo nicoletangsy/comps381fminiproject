@@ -68,7 +68,7 @@ app.get('/error',function(req,res) {
 
 //render to update restaurants.
 app.get('/update',function(req,res) {
-  res.render('update');
+  res.render('update',{id:"5bfcc6e54a786424dfdf02a7"});
 });
 
 //create record in mongodb:collection(accounts)
@@ -155,7 +155,6 @@ app.post('/update',function(req,res) {
   } else {
     var form = new formidable.IncomingForm();
     console.log('test');
-    console.log(form);
     form.parse(req, function (err, fields, files) {
       console.log('test2');
       var filename = files.filetoupload.path;
@@ -183,7 +182,7 @@ app.post('/update',function(req,res) {
               "grades": {"user": null, "score": null},
               "owner" : req.session.username
               };
-          var restaurant_id = new mongo.ObjectID(req.query._id);
+          var restaurant_id = new mongo.ObjectID(req.query.id);
           console.log(restaurant_id);
           var query = {_id: restaurant_id};
           console.log(query);
@@ -233,16 +232,14 @@ function insertRestaurants(db,r,callback) {
   db.collection('restaurants').insertOne(r,function(err,result) {
     assert.equal(err,null);
     console.log("insert was successful!");
-    console.log(JSON.stringify(result));
     callback(result);
   });
 }
 
-function updateRestaurants(db,query, r,callback) {
-  db.collection('restaurants').update({$set : r},function(err,result) {
+function updateRestaurants(db, query, r,callback) {
+  db.collection('restaurants').update(query, {$set : r},function(err,result) {
     assert.equal(err,null);
     console.log("update was successful!");
-    console.log(JSON.stringify(result));
     callback(result);
   });
 }
