@@ -101,11 +101,11 @@ app.post('/new',function(req,res) {
     res.redirect('/error');
   } else {
     var form = new formidable.IncomingForm();\
-    var photo, minetype;
+    var image, minetype;
     form.parse(req, function (err, fields, files) {
       console.log(JSON.stringify(files));
       if (files.filetoupload.size == 0) {
-        photo = null;
+        image = null;
         photo_minetype = null;
       }
       var filename = files.filetoupload.path;
@@ -122,45 +122,21 @@ app.post('/new',function(req,res) {
             res.end("MongoClient connect() failed!");
             return(-1);
           }
-          var new_r = {};
-          new_r['title'] = title;
-          new_r['mimetype'] = mimetype;
-          new_r['image'] = new Buffer(data).toString('base64');
-          insertPhoto(db,new_r,function(result) {
-            db.close();
-            res.writeHead(200, {"Content-Type": "text/plain"});
-            res.end('Photo was inserted into MongoDB!');
-          })
-        });
-      })
-    });
-    MongoClient.connect(mongourl, function(err,db) {
-      try {
-        assert.equal(err,null);
-      } catch (err) {
-        res.writeHead(500,{"Content-Type":"text/plain"}); //render error msg
-        res.end("MongoClient connect() failed!");
-      }
-      /*
-      if (err !== null) {
-        res.writeHead(500,{"Content-Type":"text/plain"}); //render error msg
-        res.end("MongoClient connect() failed!");
-        return
-      }
-      console.log("MongoClient connect() succeed!");
-      */
-      var r = {"name": req.body.name, "borough": req.body.borough, "photo": null, "photo_minetype": null, 
+          image = new Buffer(data).toString('base64');
+          var r = {"name": req.body.name, "borough": req.body.borough, "photo": image, "photo_minetype": photo_minetype, 
               "address": {"street": req.body.street, "building": req.body.building, "zipcode": req.body.zipcode, 
                         "coord": [req.body.lon, req.body.lat]}, 
               "grades": {"user": null, "score": null},
               "owner" : req.session.username
               };
-      db.collection('restaurants').insertOne(r,function(err) {
-        assert.equal(err,null);
-        db.close();
-        //console.log("insert was successful!");
-        res.redirect('/read');
-      });
+              db.collection('restaurants').insertOne(r,function(err) {
+                assert.equal(err,null);
+                db.close();
+                //console.log("insert was successful!");
+                res.redirect('/read');
+              });
+        });
+      })
     });
   }
 });
