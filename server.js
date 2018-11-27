@@ -68,7 +68,12 @@ app.get('/error',function(req,res) {
 
 //render to update restaurants.
 app.get('/update',function(req,res) {
-  res.render('update',{id:"5bfcc6e54a786424dfdf02a7"});
+  res.render('update',{id: req.query.id});
+});
+
+//render to rate restaurants.
+app.get('/rate',function(req,res) {
+  res.render('rate',{id:"5bfcc6e54a786424dfdf02a7"});
 });
 
 //create record in mongodb:collection(accounts)
@@ -133,7 +138,7 @@ app.post('/new',function(req,res) {
           var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
               "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
                         "coord": [fields.lon, fields.lat]}, 
-              "grades": {"user": null, "score": null},
+              "grades": [{"user": null, "score": null}],
               "owner" : req.session.username
               };
           insertRestaurants(db, r,function(result) {
@@ -179,7 +184,7 @@ app.post('/update',function(req,res) {
           var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
               "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
                         "coord": [fields.lon, fields.lat]}, 
-              "grades": {"user": null, "score": null},
+              "grades": [{"user": null, "score": null}],
               "owner" : req.session.username
               };
           var restaurant_id = new mongo.ObjectID(req.query.id);
@@ -194,6 +199,36 @@ app.post('/update',function(req,res) {
       });
     });
   }
+});
+
+//update rate record in mongodb:collection(restaurants)
+app.post('/rate',function(req,res) {
+  var form = new formidable.IncomingForm();
+  console.log('test');
+    form.parse(req, function (err, fields, files) {
+      console.log('test2');
+        MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+          var r = {"grades": [{"user": req.session.username, "score": fields.score}]};
+          console.log("Test Score");
+          console.log(fields.test);
+          console.log(fields.score);
+          var restaurant_id = new mongo.ObjectID(req.query.id);
+          console.log(restaurant_id);
+          var query = {_id: restaurant_id};
+        console.log(query);
+        updateRestaurants(db,query, r,function(result) {
+        db.close();
+        res.redirect('/read');
+      })
+    })
+  });
 });
 
 //check login.
