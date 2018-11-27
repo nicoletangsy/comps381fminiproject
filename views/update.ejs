@@ -1,6 +1,6 @@
 <html>
 <body>
-	<form action="/new" method="post" enctype="multipart/form-data">
+	<form action="/update?id=123" method="post" enctype="multipart/form-data">
     Name: <input type="text" name="name"><p style="color:#FF0000;">*This field must not be empty.</p><br>
 		Borough: <input type="text" name="borough"><br>
 		Cuisine: <input type="text" name="cuisine"><br>
@@ -10,7 +10,7 @@
 		GPS Coordinates (lon.): <input type="number" name="lon"><br>
 		GPS Coordinates (lat.): <input type="number" name="lat"><br>
 		Photo: <input type="file" name="filetoupload"><br>
-	<input type="submit" value="Create">
+	<input type="submit" value="Update">
 	</form>
 </body>
 </html>

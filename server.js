@@ -9,6 +9,7 @@ var formidable = require('formidable');
 var MongoClient = require('mongodb').MongoClient;
 var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
+var mongo = require('mongodb');
 
 var mongourl = "mongodb://admin123:admin123@ds245532.mlab.com:45532/nicoletangsy";
 
@@ -65,6 +66,11 @@ app.get('/error',function(req,res) {
   res.render('error');
 });
 
+//render to update restaurants.
+app.get('/update',function(req,res) {
+  res.render('update');
+});
+
 //create record in mongodb:collection(accounts)
 app.post('/createAccount',function(req,res) {
   MongoClient.connect(mongourl, function(err,db) {
@@ -94,8 +100,8 @@ app.post('/createAccount',function(req,res) {
   });
 });
 
-//create record in mongodb:collection(restaurants)
-app.post('/new',function(req,res) {
+//update record in mongodb:collection(restaurants)
+app.post('/update',function(req,res) {
   var owner = req.session.name;
   if (req.body.name == "" || owner == "") {
     res.redirect('/error');
@@ -131,7 +137,9 @@ app.post('/new',function(req,res) {
               "grades": {"user": null, "score": null},
               "owner" : req.session.username
               };
-          insertRestaurants(db,r,function(result) {
+          var restaurant_id = new mongo.ObjectID(req.query._id);
+          var query = {_id:restaurant_id};
+          updateRestaurants(db,r,function(result) {
             db.close();
             res.redirect('/read');
           })
@@ -177,6 +185,15 @@ function insertRestaurants(db,r,callback) {
   db.collection('restaurants').insertOne(r,function(err,result) {
     assert.equal(err,null);
     console.log("insert was successful!");
+    console.log(JSON.stringify(result));
+    callback(result);
+  });
+}
+
+function updateRestaurants(db,query, r,callback) {
+  db.collection('restaurants').update({$set : r},function(err,result) {
+    assert.equal(err,null);
+    console.log("update was successful!");
     console.log(JSON.stringify(result));
     callback(result);
   });
