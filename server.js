@@ -100,18 +100,20 @@ app.post('/new',function(req,res) {
   if (req.body.name == "" || owner == "") {
     res.redirect('/error');
   } else {
-    var form = new formidable.IncomingForm();\
-    var image, minetype;
+    var form = new formidable.IncomingForm();
+    console.log('test');
+    console.log(form);
     form.parse(req, function (err, fields, files) {
+      console.log('test2');
       console.log(JSON.stringify(files));
-      if (files.filetoupload.size == 0) {
-        image = null;
-        photo_minetype = null;
-      }
       var filename = files.filetoupload.path;
-      if (files.filetoupload.type) {
-        mimetype = files.filetoupload.type;
+      if (fields.title) {
+        var title = (fields.title.length > 0) ? fields.title : "untitled";
       }
+      if (files.filetoupload.type) {
+        var mimetype = files.filetoupload.type;
+      }
+      console.log("title = " + title);
       console.log("filename = " + filename);
       fs.readFile(filename, function(err,data) {
         MongoClient.connect(mongourl,function(err,db) {
@@ -120,23 +122,21 @@ app.post('/new',function(req,res) {
           } catch (err) {
             res.writeHead(500,{"Content-Type":"text/plain"});
             res.end("MongoClient connect() failed!");
-            return(-1);
           }
-          image = new Buffer(data).toString('base64');
-          var r = {"name": req.body.name, "borough": req.body.borough, "photo": image, "photo_minetype": photo_minetype, 
-              "address": {"street": req.body.street, "building": req.body.building, "zipcode": req.body.zipcode, 
-                        "coord": [req.body.lon, req.body.lat]}, 
+          console.log("MongoClient connect() succeed!");
+          var image = new Buffer(data).toString('base64');
+          var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
+              "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
+                        "coord": [fields.lon, fields.lat]}, 
               "grades": {"user": null, "score": null},
               "owner" : req.session.username
               };
-              db.collection('restaurants').insertOne(r,function(err) {
-                assert.equal(err,null);
-                db.close();
-                //console.log("insert was successful!");
-                res.redirect('/read');
-              });
-        });
-      })
+          insertRestaurants(db,r,function(result) {
+            db.close();
+            res.redirect('/read');
+          })
+        })
+      });
     });
   }
 });
@@ -172,5 +172,14 @@ app.get('/logout',function(req,res) {
 	req.session = null;
 	res.redirect('/');
 });
+
+function insertRestaurants(db,r,callback) {
+  db.collection('restaurants').insertOne(r,function(err,result) {
+    assert.equal(err,null);
+    console.log("insert was successful!");
+    console.log(JSON.stringify(result));
+    callback(result);
+  });
+}
 
 app.listen(process.env.PORT || 8099); 
