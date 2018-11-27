@@ -51,7 +51,7 @@ app.get('/createAccount',function(req,res) {
   res.render('createAccount');
 });
 
-//render to create restaurant.
+//render to create new restaurant.
 app.get('/new',function(req,res) {
   res.render('new');
 });
@@ -99,6 +99,53 @@ app.post('/createAccount',function(req,res) {
     });
   });
 });
+
+//create record in mongodb:collection(restaurants)
+app.post('/new',function(req,res) {
+  var owner = req.session.name;
+  if (req.body.name == "" || owner == "") {
+    res.redirect('/error');
+  } else {
+    var form = new formidable.IncomingForm();
+    console.log('test');
+    console.log(form);
+    form.parse(req, function (err, fields, files) {
+      console.log('test2');
+      var filename = files.filetoupload.path;
+      if (fields.title) {
+        var title = (fields.title.length > 0) ? fields.title : "untitled";
+      }
+      if (files.filetoupload.type) {
+        var mimetype = files.filetoupload.type;
+      }
+      console.log("title = " + title);
+      console.log("filename = " + filename);
+      fs.readFile(filename, function(err,data) {
+        MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+          var image = new Buffer(data).toString('base64');
+          var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
+              "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
+                        "coord": [fields.lon, fields.lat]}, 
+              "grades": {"user": null, "score": null},
+              "owner" : req.session.username
+              };
+          insertRestaurants(db, r,function(result) {
+            db.close();
+            res.redirect('/read');
+          })
+        })
+      });
+    });
+  }
+});
+
 
 //update record in mongodb:collection(restaurants)
 app.post('/update',function(req,res) {
