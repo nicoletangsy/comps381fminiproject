@@ -111,7 +111,6 @@ app.post('/update',function(req,res) {
     console.log(form);
     form.parse(req, function (err, fields, files) {
       console.log('test2');
-      console.log(JSON.stringify(files));
       var filename = files.filetoupload.path;
       if (fields.title) {
         var title = (fields.title.length > 0) ? fields.title : "untitled";
@@ -138,8 +137,10 @@ app.post('/update',function(req,res) {
               "owner" : req.session.username
               };
           var restaurant_id = new mongo.ObjectID(req.query._id);
-          var query = {_id:restaurant_id};
-          updateRestaurants(db,r,function(result) {
+          console.log(restaurant_id);
+          var query = {_id: restaurant_id};
+          console.log(query);
+          updateRestaurants(db,query, r,function(result) {
             db.close();
             res.redirect('/read');
           })
