@@ -96,28 +96,22 @@ app.post('/createAccount',function(req,res) {
 
 //create record in mongodb:collection(restaurants)
 app.post('/new',function(req,res) {
-  var photo;
-  if (req.body.name == "" || req.body.owner == "") {
+  var owner = req.session.name;
+  if (req.body.name == "" || owner == "") {
     res.redirect('/error');
   } else {
-    var form = new formidable.IncomingForm();
-    var files = req.body.files;
+    var form = new formidable.IncomingForm();\
+    var photo, minetype;
     form.parse(req, function (err, fields, files) {
       console.log(JSON.stringify(files));
       if (files.filetoupload.size == 0) {
         photo = null;
+        photo_minetype = null;
       }
       var filename = files.filetoupload.path;
-      if (fields.title) {
-        var title = (fields.title.length > 0) ? fields.title : "untitled";
-      }
-      if (fields.description) {
-        var description = (fields.description.length > 0) ? fields.description : "n/a";
-      }
       if (files.filetoupload.type) {
-        var mimetype = files.filetoupload.type;
+        mimetype = files.filetoupload.type;
       }
-      console.log("title = " + title);
       console.log("filename = " + filename);
       fs.readFile(filename, function(err,data) {
         MongoClient.connect(mongourl,function(err,db) {
@@ -126,27 +120,20 @@ app.post('/new',function(req,res) {
           } catch (err) {
             res.writeHead(500,{"Content-Type":"text/plain"});
             res.end("MongoClient connect() failed!");
+            return(-1);
           }
           var new_r = {};
           new_r['title'] = title;
-          new_r['description'] = description;
           new_r['mimetype'] = mimetype;
           new_r['image'] = new Buffer(data).toString('base64');
-          db.collection('photos').insertOne(new_r,function(err) {
-            assert.equal(err,null);
-            db.close();
-            console.log("photo was inserted successfully!");
-            res.redirect('/read');
-          });
-          /*insertPhoto(db,new_r,function(result) {
+          insertPhoto(db,new_r,function(result) {
             db.close();
             res.writeHead(200, {"Content-Type": "text/plain"});
             res.end('Photo was inserted into MongoDB!');
-          })*/
+          })
         });
       })
     });
-
     MongoClient.connect(mongourl, function(err,db) {
       try {
         assert.equal(err,null);
@@ -166,7 +153,7 @@ app.post('/new',function(req,res) {
               "address": {"street": req.body.street, "building": req.body.building, "zipcode": req.body.zipcode, 
                         "coord": [req.body.lon, req.body.lat]}, 
               "grades": {"user": null, "score": null},
-              "owner" : req.body.owner
+              "owner" : req.session.username
               };
       db.collection('restaurants').insertOne(r,function(err) {
         assert.equal(err,null);
