@@ -1,0 +1,20 @@
+<html>
+	<head>
+	<title>Search</title>
+	</head>
+	<body>
+    	<form action="/search" method="post" enctype="multipart/form-data">
+    		<p>Search By: </p><br>
+    		<select name="searchBy">
+        	<option value="name">name</option>
+        	<option value="borough">borough</option>
+        	<option value="cuisine">cuisine</option>
+        	<option value="building">building</option>
+        	<option value="street">street</option>
+        	<option value="zipcode">zipcode</option>
+    		</select>
+    		<input type="text" name="field"><br>
+    		<input type="submit" value="Search">
+		</form>
+	</body>
+</html>

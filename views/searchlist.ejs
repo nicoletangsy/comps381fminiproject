@@ -1,0 +1,13 @@
+<html>
+	<head>
+	<title>Search results</title>
+	</head>
+	<body>
+		<H1>Search results:</H1>
+        <ol>
+            <% result.forEach(function(restaurant) { %>
+        <li><a href=/display?id=<%= restaurant._id %>><%= restaurant.name %></a></li>
+        <% });%>
+		</ol>
+	</body>
+</html>

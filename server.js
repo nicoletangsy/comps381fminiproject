@@ -76,6 +76,12 @@ app.get('/rate',function(req,res) {
   res.render('rate',{id:"5bfcc6e54a786424dfdf02a7"});
 });
 
+//render to search restaurants
+app.get('/search',function(req,res) {
+  res.render('search');
+});
+
+
 //create record in mongodb:collection(accounts)
 app.post('/createAccount',function(req,res) {
   MongoClient.connect(mongourl, function(err,db) {
@@ -135,7 +141,7 @@ app.post('/new',function(req,res) {
           }
           console.log("MongoClient connect() succeed!");
           var image = new Buffer(data).toString('base64');
-          var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
+          var r = {"name": fields.name, "borough": fields.borough,"cuisine":fields.cuisine, "photo": image, "photo_minetype": mimetype, 
               "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
                         "coord": [fields.lon, fields.lat]}, 
               "grades": [{"user": null, "score": null}],
@@ -181,7 +187,7 @@ app.post('/update',function(req,res) {
           }
           console.log("MongoClient connect() succeed!");
           var image = new Buffer(data).toString('base64');
-          var r = {"name": fields.name, "borough": fields.borough, "photo": image, "photo_minetype": mimetype, 
+          var r = {"name": fields.name, "borough": fields.borough,"cuisine":fields.cuisine, "photo": image, "photo_minetype": mimetype, 
               "address": {"street": fields.street, "building": fields.building, "zipcode": fields.zipcode, 
                         "coord": [fields.lon, fields.lat]}, 
               "grades": [{"user": null, "score": null}],
@@ -231,6 +237,118 @@ app.post('/rate',function(req,res) {
   });
 });
 
+//list all the restaurants
+ app.get('/list',function(req,res) {    
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          
+          console.log("MongoClient connect() succeed!");
+
+      listRestaurants(db,function(result){     
+      db.close();
+      res.render('list', {result:result});
+
+      
+    });
+  });
+});
+
+//display restaurant detail of a restaurant
+app.get('/display',function(req,res) {    
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          var restaurant_id = new mongo.ObjectID(req.query.id);
+          var query = {_id: restaurant_id};
+          console.log("MongoClient connect() succeed!");
+
+      displayRestaurants(db,query,function(result){     
+      db.close();
+      res.render('display', {result:result[0]});
+
+      
+    });
+  });
+});
+
+
+
+//delete restaurant by owner
+app.get('/delete',function(req,res) {    
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+
+          var restaurant_id = new mongo.ObjectID(req.query.id);
+          var query = {_id: restaurant_id , owner: req.session.username};
+          console.log("MongoClient connect() succeed!");
+
+      deleteRestaurants(db,query,function(result){     
+      db.close();
+      res.render('deleted');
+
+      
+    });
+  });
+});
+
+//connect to google map
+app.get("/gmap", function(req,res) {
+  res.render("gmap.ejs", {
+    lat:req.query.lat,
+    lon:req.query.lon,
+    zoom:req.query.zoom
+  });
+  res.end();
+});
+
+//search restaurant
+app.post("/search", function(req,res) {
+  var form = new formidable.IncomingForm();
+    console.log('test');
+    console.log(form);
+    form.parse(req, function (err, fields, files) {
+      console.log('test2');
+
+        MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+
+          var query = {name :fields.field};
+          console.log("Test search");
+          console.log(fields.searchBy);
+          console.log(fields.field);
+        console.log(query);
+        search(db,query,function(result) {
+        db.close();
+        res.render('searchlist',{result:result});
+
+        })
+      
+    });
+});
+});
+
+
+
 //check login.
 app.post('/login',function(req,res) {
   MongoClient.connect(mongourl, function(err,db) {
@@ -278,5 +396,57 @@ function updateRestaurants(db, query, r,callback) {
     callback(result);
   });
 }
+
+function displayRestaurants(db,query,callback){
+  var result = [];
+  var cursor = db.collection('restaurants').find(query);
+    
+  cursor.each(function(err, doc) {
+    assert.equal(err, null); 
+    if (doc != null) {
+      result.push(doc);
+    } else {
+      callback(result);
+    }
+  });
+}
+
+function listRestaurants(db,callback){
+  var result = [];
+  var cursor = db.collection('restaurants').find();
+    
+  cursor.each(function(err, doc) {
+    assert.equal(err, null); 
+    if (doc != null) {
+      result.push(doc);
+    } else {
+      callback(result);
+    }
+  });
+}
+
+function search(db,query,callback){
+  var result = [];
+  var cursor = db.collection('restaurants').find(query);
+    
+  cursor.each(function(err, doc) {
+    assert.equal(err, null); 
+    if (doc != null) {
+      result.push(doc);
+    } else {
+      callback(result);
+    }
+  });
+}
+
+function deleteRestaurants(db,query,callback){ 
+  db.collection('restaurants').remove(query,function(err,result) {
+    assert.equal(err,null);
+    console.log("delete was successful!");
+    callback(result);
+  });
+}
+
+ 
 
 app.listen(process.env.PORT || 8099); 

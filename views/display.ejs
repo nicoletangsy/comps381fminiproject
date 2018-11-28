@@ -1,0 +1,26 @@
+<html>
+	<head>
+	<title>Restaurant Information</title>
+	</head>
+	<body>
+		<p>Restaurant ID: <%=result._id%><br>
+		Name: <%=result.name%><br>
+		Borough: <%=result.borough%><br>
+		Cuisine: <%=result.cuisine%><br>
+		Street: <%=result.address.street%><br>
+		Building: <%=result.address.building%><br>
+		Zipcode: <%=result.address.zipcode%><br>
+		
+		<%if(result.photo!= ""){%>
+        <img src="data:<%= result.mimetype%>;base64, <%=result.photo%>"height="42" width="42">
+        <br>
+        <%}%>
+        <%if(result.address.coord[0]!="" && result.address.coord[1]!=""){%>
+            <a href="/gmap?lat=<%=result.address.coord[0]%>&lon=<%=result.address.coord[1]%>">Google map</a>
+        <%}%>
+        <a href=/delete?id=<%= result._id %>>delete</a>
+        <a href=/rate?id=<%= result._id %>>rate</a>
+
+		</p>
+	</body>
+</html>

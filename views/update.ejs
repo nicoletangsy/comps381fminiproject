@@ -1,16 +1,21 @@
 <html>
-<body>
-	<form action="/update?id=<%=id%>" method="post" enctype="multipart/form-data">
-    Name: <input type="text" name="name"><p style="color:#FF0000;">*This field must not be empty.</p><br>
-		Borough: <input type="text" name="borough"><br>
-		Cuisine: <input type="text" name="cuisine"><br>
-		Street: <input type="text" name="street"><br>
-		Building: <input type="text" name="building"><br>
-		Zipcode: <input type="text" name=zipcode><br>
-		GPS Coordinates (lon.): <input type="number" name="lon"><br>
-		GPS Coordinates (lat.): <input type="number" name="lat"><br>
-		Photo: <input type="file" name="filetoupload"><br>
-	<input type="submit" value="Update">
-	</form>
-</body>
+	<head>
+	<title>Update Restaurant</title>
+	</head>
+	<body>
+
+		<form action="/update?id=<%=id%>" method="post" enctype="multipart/form-data">
+			<p>Update Restaurant Form:</pp><br>
+    		Name: <input type="text" name="name"><p style="color:#FF0000;">*This field must not be empty.</p><br>
+			Borough: <input type="text" name="borough"><br>
+			Cuisine: <input type="text" name="cuisine"><br>
+			Street: <input type="text" name="street"><br>
+			Building: <input type="text" name="building"><br>
+			Zipcode: <input type="text" name=zipcode><br>
+			GPS Coordinates (lon.): <input type="number" name="lon"><br>
+			GPS Coordinates (lat.): <input type="number" name="lat"><br>
+			Photo: <input type="file" name="filetoupload"><br>
+			<input type="submit" value="Update">
+		</form>
+	</body>
 </html>
