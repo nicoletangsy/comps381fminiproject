@@ -198,10 +198,7 @@ app.post('/new',function(req,res) {
 
   var owner = req.session.name;
     var form = new formidable.IncomingForm();
-    console.log('test');
-    console.log(form);
     form.parse(req, function (err, fields, files) {
-      console.log('test2');
       var filename = files.filetoupload.path;
       if (fields.title) {
         var title = (fields.title.length > 0) ? fields.title : "untitled";
@@ -469,6 +466,60 @@ app.post("/search", function(req,res) {
 });
 });
 
+// 8(name): get by restful services
+app.get('/api/restaurant/name/:name',function(req,res){
+    var query = {name:req.params.name};
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+        search(db,query,function(result) {
+        db.close();
+        res.status(200).json(result).end();
+
+        })
+});});
+
+// 8(name): get by restful services
+app.get('/api/restaurant/borough/:borough',function(req,res){
+    var query = {name:req.params.borough};
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+        search(db,query,function(result) {
+        db.close();
+        res.status(200).json(result).end();
+
+        })
+});});
+
+// 8(cuisine): get by restful services
+app.get('/api/restaurant/cuisine/:cuisine',function(req,res){
+    var query = {name:req.params.cuisine};
+    MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            res.end("MongoClient connect() failed!");
+          }
+          console.log("MongoClient connect() succeed!");
+        search(db,query,function(result) {
+        db.close();
+        res.status(200).json(result).end();
+
+        })
+    
+});});
 
 
 
