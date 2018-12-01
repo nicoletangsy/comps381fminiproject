@@ -1,6 +1,6 @@
 <html>
 	<head>
-	<title>Search results</title>
+	<title>Not owner of the Restaurant</title>
 	<style>
 		h1 {
 			background-color: #004d00;
@@ -9,12 +9,10 @@
 			}
 		body {
 			font-family:  courier;
-			font-size: 20;
-			color :#004d00;
+			font-size: 17;
 			margin: 0px;
-
 		}
-		.button 	{
+		a 	{
   			text-decoration: none;
   			background-color: #004d00;
   			color: white;
@@ -24,19 +22,14 @@
   			border-bottom: 2px solid #333333;
   			border-left: 2px solid #CCCCCC;
 			}
-		a 	{
-			text-decoration: none;
-			color :#004d00;
-		}
 	</style>
 	</head>
 	<body>
-		<H1>Search results:</H1>
-		<p align="right" >user:<%=session%> <a href=/logout class="button">logout</a></p>
-        <ol>
-            <% result.forEach(function(restaurant) { %>
-        <li><a href=/display?id=<%= restaurant._id %>><%= restaurant.name %></a></li>
-        <% });%>
-		</ol>
+		<h1>Error</h1>
+		<p>
+			Sorry! You don't have the right to do this.
+		Only the owner of the restaurant can do this action
+		</p>
+		<a href=/list >Back to restaurant list</a> 
 	</body>
 </html>
