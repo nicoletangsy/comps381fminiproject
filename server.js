@@ -198,7 +198,10 @@ app.post('/new',function(req,res) {
 
   var owner = req.session.name;
     var form = new formidable.IncomingForm();
+    console.log('test');
+    console.log(form);
     form.parse(req, function (err, fields, files) {
+      console.log('test2');
       var filename = files.filetoupload.path;
       if (fields.title) {
         var title = (fields.title.length > 0) ? fields.title : "untitled";
@@ -237,7 +240,6 @@ app.post('/new',function(req,res) {
       });
     });
 });
-
 
 // 3: update record in mongodb:collection(restaurants) only by owner
 app.post('/update',function(req,res) {
@@ -521,6 +523,31 @@ app.get('/api/restaurant/cuisine/:cuisine',function(req,res){
     
 });});
 
+// 8: post create new restaurant
+app.post('/api/restaurant/:r',function(req,res) {
+        MongoClient.connect(mongourl,function(err,db) {
+          try {
+            assert.equal(err,null);
+          } catch (err) {
+            res.writeHead(500,{"Content-Type":"text/plain"});
+            var failed = {status:failed};
+             res.status(200).json(failed).end();
+          }
+          console.log("MongoClient connect() succeed!");
+          if(files.filetoupload!=null){
+            var image = new Buffer(data).toString('base64');
+          }
+          else{
+            var image = null;
+          }
+          insertRestaurants(db, req.params.r,function(result) {
+            db.close();
+            var ok = {status:ok,_id:result._id};
+            res.status(200).json(ok).end();
+          })
+        })
+      
+    });
 
 
 
