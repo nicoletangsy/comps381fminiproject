@@ -534,12 +534,6 @@ app.post('/api/restaurant/:r',function(req,res) {
              res.status(200).json(failed).end();
           }
           console.log("MongoClient connect() succeed!");
-          if(files.filetoupload!=null){
-            var image = new Buffer(data).toString('base64');
-          }
-          else{
-            var image = null;
-          }
           insertRestaurants(db, req.params.r,function(result) {
             db.close();
             var ok = {status:ok,_id:result._id};
