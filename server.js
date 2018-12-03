@@ -524,7 +524,22 @@ app.get('/api/restaurant/cuisine/:cuisine',function(req,res){
 });});
 
 // 8: post create new restaurant
-app.post('/api/restaurant/:r',function(req,res) {
+app.post('/api/restaurant/',function(req,res) {
+        var r = req.body;
+        if((r.name==null||r.name=="")&&(r.owner==null||r.owner=="")){
+          res.status(200).json(failed).end();
+        }
+        var address = {
+            "street": "",
+            "building": "",
+            "zipcode": "", 
+            "coord": ["",""]};
+        r.borough = "";
+        r.cuisine="";
+        r.photo =null;
+        r.photo_minetype= "mimetype";
+        r.address=address;
+            
         MongoClient.connect(mongourl,function(err,db) {
           try {
             assert.equal(err,null);
@@ -534,12 +549,12 @@ app.post('/api/restaurant/:r',function(req,res) {
              res.status(200).json(failed).end();
           }
           console.log("MongoClient connect() succeed!");
-          insertRestaurants(db, req.params.r,function(result) {
+          insertRestaurants(db, r,function(result) {
             db.close();
             var ok = {status:ok,_id:result._id};
             res.status(200).json(ok).end();
           })
-        })
+        });
       
     });
 
@@ -550,7 +565,7 @@ app.post('/api/restaurant/:r',function(req,res) {
 function insertRestaurants(db,r,callback) {
   db.collection('restaurants').insertOne(r,function(err,result) {
     assert.equal(err,null);
-    console.log("insert was successful!");
+    console.log("insert was successful!!!");
     callback(result);
   });
 }
