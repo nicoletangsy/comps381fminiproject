@@ -36,7 +36,7 @@
 		<a href=/logout>logout</a>  </p>                 
 		
 		
-		<%if(result.photo!= null && result.photo!= ""){%>
+		<%if(result.photo!= null && result.photo!= "" && result.photo_minetype.indexOf("image")!=-1){%>
 		Photo: <br>
         <img src="data:<%= result.mimetype%>;base64, <%=result.photo%>"width="200" >
         <br>
