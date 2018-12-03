@@ -30,7 +30,7 @@ app.use(express.static('public'));
 
 //redirect to login.
 app.get('/',function(req,res) {
-	console.log(req.session);
+
 	if (!req.session.authenticated) {
     res.redirect('/login');
 	} else {
@@ -179,6 +179,7 @@ app.post('/login',function(req,res) {
     var r = {};
     r.name = req.body.name;
     r.password = req.body.password;
+    console.log(r);r
     var cursor = db.collection('accounts').find(r);
     var result = [];
     cursor.each(function(err, doc) {
@@ -332,7 +333,7 @@ app.post('/rate',function(req,res) {
         console.log(query);
         rateRestaurants(db,query, r,function(result) {
           db.close();
-          res.render('rateSuccess');
+          res.redirect('/list');
         })
       })
   });
