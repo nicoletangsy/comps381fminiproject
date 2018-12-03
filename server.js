@@ -489,7 +489,7 @@ app.get('/api/restaurant/name/:name',function(req,res){
 
 // 8(name): get by restful services
 app.get('/api/restaurant/borough/:borough',function(req,res){
-    var query = {name:req.params.borough};
+    var query = {borough:req.params.borough};
     MongoClient.connect(mongourl,function(err,db) {
           try {
             assert.equal(err,null);
@@ -507,7 +507,7 @@ app.get('/api/restaurant/borough/:borough',function(req,res){
 
 // 8(cuisine): get by restful services
 app.get('/api/restaurant/cuisine/:cuisine',function(req,res){
-    var query = {name:req.params.cuisine};
+    var query = {cuisine:req.params.cuisine};
     MongoClient.connect(mongourl,function(err,db) {
           try {
             assert.equal(err,null);
