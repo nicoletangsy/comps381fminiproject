@@ -541,7 +541,7 @@ app.post('/api/restaurant/',function(req,res) {
         r.photo =null;
         r.photo_minetype= "mimetype";
         r.address=address;
-        r.grades:[],
+        r.grades=[];
             
         MongoClient.connect(mongourl,function(err,db) {
           try {
