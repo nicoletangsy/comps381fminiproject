@@ -528,6 +528,7 @@ app.get('/api/restaurant/cuisine/:cuisine',function(req,res){
 app.post('/api/restaurant/',function(req,res) {
         var r = req.body;
         if((r.name==null||r.name=="")&&(r.owner==null||r.owner=="")){
+          var failed = {status:"failed"};
           res.status(200).json(failed).end();
         }
         var address = {
@@ -552,7 +553,9 @@ app.post('/api/restaurant/',function(req,res) {
           console.log("MongoClient connect() succeed!");
           insertRestaurants(db, r,function(result) {
             db.close();
-            var ok = {status:ok,_id:result._id};
+            console.log(result);
+            var ok = {status:"ok",_id:result.insertedId};
+            console.log(ok)
             res.status(200).json(ok).end();
           })
         });
