@@ -2,7 +2,7 @@
   "name": "server",
   "description": "NodeJS Session",
   "author": "Nicole Tang <g1165891@study.ouhk.edu.hk>",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
     "body-parser": "*",
     "cookie-session": "*",
